@@ -82,11 +82,13 @@
                       <svg width="500" height="500" id="svgMorpionBoard">
                         <g v-for="item in items" :key="item.id">
                           <rect
+                            :id="item.id"
                             :x="item.x"
                             :y="item.y"
                             width="100"
                             height="100"
                             style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
+                            @click="sendmessage"
                           />
                         </g>
                       </svg>
@@ -172,8 +174,15 @@ export default {
         }
       )
     }
+
+    window.APIClient.joinGame(this.room);
+    window.APIClient.sendMessage("demo");
+    //window.APIClient.on("message", console.log("coucou"))
   },
   methods: {
+    sendmessage(event) {
+      window.APIClient.sendMessage(event.currentTarget.id);
+    }
   }
 };
 </script>

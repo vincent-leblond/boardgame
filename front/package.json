@@ -12,6 +12,7 @@
     "axios": "^0.19.0",
     "chroma-js": "^2.0.6",
     "core-js": "^2.6.5",
+    "d3": "^5.15.1",
     "dataframe-js": "^1.4.3",
     "file-saver": "^2.0.2",
     "plotly.js": "^1.51.1",

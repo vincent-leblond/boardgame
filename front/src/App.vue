@@ -29,9 +29,9 @@
       app
       width="620px"
     >
-      <v-container>
+      <v-container v-if="visio">
         <iframe
-            v-show="visio"
+            
             id="myIframe"
             allow="camera; microphone"
             width="600"
@@ -51,9 +51,6 @@
       <v-toolbar-title style="width: 400px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">
           Jeux
-          &nbsp;&nbsp;
-          <v-progress-circular v-if="isLoading" :width="3" :size="20" color="#FFFFFF" indeterminate></v-progress-circular>&nbsp;&nbsp;
-          <span style="color: #ff0000">{{ error_msg }}</span>
         </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
@@ -65,8 +62,8 @@
           background-color="transparent"
           class="pt-1"
         >
-          <v-tab>Jeu 1</v-tab>
-          <v-tab>Jeu 2</v-tab>
+          <v-tab>Morpion</v-tab>
+          <!-- <v-tab>Jeu 2</v-tab> -->
         </v-tabs>
       </v-toolbar-items>
     </v-app-bar>
@@ -77,7 +74,26 @@
           <!-- TAB 1 -->
           <v-tab-item style="height: 100%">
             <v-container fluid>
-              Puissance 4
+              <v-row>
+                <v-col col="6" md="6">
+                  <v-card class="pa-0">
+                    <div id="test"></div>
+                    <div class="ma-n2" id="morpionboard">
+                      <svg width="500" height="500" id="svgMorpionBoard">
+                        <g v-for="item in items" :key="item.id">
+                          <rect
+                            :x="item.x"
+                            :y="item.y"
+                            width="100"
+                            height="100"
+                            style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
+                          />
+                        </g>
+                      </svg>
+                    </div>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-container>
           </v-tab-item>
           <!-- TAB 2 -->
@@ -100,7 +116,9 @@ export default {
   },
   data() {
     return {
-      overlay: true,
+      items: [],
+
+      overlay: false,
       error_msg: "",
 
       visio: true,
@@ -143,6 +161,17 @@ export default {
   computed: {
   },
   mounted() {
+    let size = 100;
+    for(let row=1;row<=3;row++) {
+      for(let col=1;col<=3;col++)
+      this.items.push(
+        {
+          id: row * 10 + col,
+          x: row * size,
+          y: col * size
+        }
+      )
+    }
   },
   methods: {
   }
@@ -150,17 +179,9 @@ export default {
 </script>
 
 <style>
-.footer {
-  color: #ffffff;
-  text-align: center;
-}
-
 .v-overlay__scrim {
   background-color: #37ab9c !important;
 }
 
-#rcorners1 {
-  border-radius: 25px;
-}
 </style>
 

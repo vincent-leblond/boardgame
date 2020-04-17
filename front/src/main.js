@@ -11,16 +11,18 @@ class WebSocketClient {
     this.ws = new WebSocket("ws://localhost:8081");
     this.ws.onopen = () => {};
     this.ws.onmessage = ({ data }) => {
-      // eslint-disable-next-line
       if (data.startsWith("CMD:")) {
         let info = /CMD:(?<cmd>[^:]+):(?<args>.*)/.exec(data);
         if (!info) {
+          // eslint-disable-next-line
           console.error("Cannot parse WS command", data);
           return;
         }
+        // eslint-disable-next-line
+        console.log(data);
         if (this.listeners[info.groups.cmd]) {
-          this.listeners[info.groups.cmd].forEach((listner) => {
-            this.listeners[info.groups.cmd](...JSON.stringify(info.groups.args));
+          this.listeners[info.groups.cmd].forEach((listener) => {
+            listener(...JSON.stringify(info.groups.args));
           });
         }
       }

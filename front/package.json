@@ -17,6 +17,7 @@
     "plotly.js": "^1.51.1",
     "plotly.js-dist": "^1.49.5",
     "read-excel-file": "^4.0.5",
+    "uuid": "^7.0.3",
     "vue": "^2.6.10",
     "vue-json-viewer": "^2.2.4",
     "vue-plotly": "^1.0.1",

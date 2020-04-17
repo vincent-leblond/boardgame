@@ -1,0 +1,11 @@
+{
+  "name": "boardgame-backend",
+  "version": "0.1.0",
+  "description": "WebSockets simple server",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^7.0.3",
+    "ws": "^7.2.3"
+  }
+}

@@ -26,7 +26,7 @@ class Game {
       return;
     }
     this.players = this.players.splice(idx, 1);
-    this.broadcastCommand(undefined, "quitPlayer", player.playerId);
+    this.broadcastCommand(undefined, "quit", player.playerId);
   }
 
   join(player) {
@@ -34,11 +34,11 @@ class Game {
       return;
     }
     this.players.push(player);
-    this.broadcastCommand(player, "newPlayer", player.playerId);
+    this.broadcastCommand(player, "join", player.playerId);
   }
 
   update(player, info) {
-    this.broadcastCommand(player, "updateGame", player.playerId, info);
+    this.broadcastCommand(player, "update", player.playerId, info);
   }
 
   message(player, msg) {

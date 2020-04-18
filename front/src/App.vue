@@ -128,7 +128,7 @@ export default {
       isLoading: false,
       errormsg: "",
       tab: null,
-      room: "dsdklslfkjdlfkjdlfk"
+      room: "boardgame"
     };
   },
   created() {
@@ -143,7 +143,7 @@ export default {
     let visio = params.get("visio");
 
     if(visio === undefined) {
-      vm.visio = false;
+      vm.visio = true;
     } else if (visio == "false") {
       vm.visio = false;
     }
@@ -154,10 +154,8 @@ export default {
       vm.development_mode = true;
     }
 
-    if(room === undefined) {
-      vm.room = "sfflllklklklkl";
-    } else {
-      vm.room = room;
+    if(room !== null) {
+      vm.room = vm.room + "_" + room;
     }
   },
   computed: {
@@ -176,8 +174,12 @@ export default {
     }
 
     window.APIClient.joinGame(this.room);
-    window.APIClient.sendMessage("demo");
-    //window.APIClient.on("message", console.log("coucou"))
+    window.APIClient.on("message", (player, msg) => {
+      // eslint-disable-next-line
+      console.log("NEW MESSAGE");
+      // eslint-disable-next-line
+      console.log(msg);
+    });
   },
   methods: {
     sendmessage(event) {

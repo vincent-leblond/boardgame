@@ -8,8 +8,14 @@ class WebSocketClient {
   constructor() {
     this.gameId = undefined;
     this.listeners = {};
-    this.ws = new WebSocket("ws://localhost:8081");
-    this.ws.onopen = () => {};
+    this.ws = new WebSocket("ws://94.23.12.225:908/");
+    this.ws.onopen = () => {
+      if (this.listeners["connect"]) {
+        this.listeners["connect"].forEach((listener) => {
+          listener();
+        });
+      }
+    };
     this.ws.onmessage = ({ data }) => {
       if (data.startsWith("CMD:")) {
         let info = /CMD:(?<cmd>[^:]+):(?<args>.*)/.exec(data);
@@ -19,10 +25,10 @@ class WebSocketClient {
           return;
         }
         // eslint-disable-next-line
-        console.log(data);
+        // console.log(info.groups);
         if (this.listeners[info.groups.cmd]) {
           this.listeners[info.groups.cmd].forEach((listener) => {
-            listener(...JSON.stringify(info.groups.args));
+            listener(...JSON.parse(info.groups.args));
           });
         }
       }

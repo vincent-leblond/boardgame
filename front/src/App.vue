@@ -10,7 +10,7 @@
         <v-row justify="start" align="center">
           <v-col col="12" md="12" class="text-center">
             <br />
-            <h1>BOARD GAME</h1>
+            <h1>Jeux d'enfants</h1>
             <br />
             <v-btn
               @click="overlay = false;"
@@ -50,7 +50,7 @@
     >
       <v-toolbar-title style="width: 400px" class="ml-0 pl-4">
         <span class="hidden-sm-and-down">
-          Jeux
+          Jeux d'enfants
         </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
@@ -78,7 +78,10 @@
                 <v-col col="6" md="6">
                   <v-card class="pa-0">
                     <div class="ma-n2" id="morpionboard">
-                      <svg width="500" height="500" id="svgMorpionBoard">
+                      <svg
+                        :width="games.morpion.params.svg_size"
+                        :height="games.morpion.params.svg_size"
+                        id="svgMorpionBoard">
                         <!-- add board -->
                         <g v-for="item in games.morpion.board" :key="item.id">
                           <rect
@@ -174,6 +177,9 @@ export default {
           params: {
             n_cell: 3,
             size: 100,
+            svg_size: 350,
+            left_margin: 20,
+            top_margin: 20,
             board: {
               default_visibility: true
             },
@@ -245,13 +251,15 @@ export default {
     let cross = this.games.morpion.params.cross;
     let circle = this.games.morpion.params.circle;
     let n_cell = this.games.morpion.params.n_cell;
-    for(let row=1;row<=n_cell;row++) {
-      for(let col=1;col<=n_cell;col++) {
+    let left_margin = this.games.morpion.params.left_margin;
+    let top_margin = this.games.morpion.params.top_margin;
+    for(let row=0;row<n_cell;row++) {
+      for(let col=0;col<n_cell;col++) {
         this.games.morpion.board.push(
           {
             id: "board_" + row + "_" + col,
-            x: row * size,
-            y: col * size,
+            x: row * size + left_margin,
+            y: col * size + top_margin,
             width: size,
             height: size,
             visibility: true
@@ -261,8 +269,8 @@ export default {
         this.games.morpion.circle.push(
           {
             id: "circle_" + row + "_" + col,
-            cx: (row + 0.5) * size,
-            cy: (col + 0.5) * size,
+            cx: (row + 0.5) * size + left_margin,
+            cy: (col + 0.5) * size + top_margin,
             r: size / circle.proportion,
             visibility: circle.default_visibility,
             color: circle.color,
@@ -274,20 +282,20 @@ export default {
           {
             id: "cross_" + row + "_" + col,
             x1: [
-              row * size + cross.margin,
-              row * size + cross.margin,
+              row * size + cross.margin + left_margin,
+              row * size + cross.margin + left_margin,
               ],
             x2: [
-              (row + 1) * size - cross.margin,
-              (row + 1) * size - cross.margin,
+              (row + 1) * size - cross.margin + left_margin,
+              (row + 1) * size - cross.margin + left_margin,
             ],
             y1: [
-              col * size + cross.margin,
-              (col + 1) * size - cross.margin
+              col * size + cross.margin + top_margin,
+              (col + 1) * size - cross.margin + top_margin
             ],
             y2: [
-              (col + 1) * size - cross.margin,
-              col * size + cross.margin
+              (col + 1) * size - cross.margin + top_margin,
+              col * size + cross.margin + top_margin
             ],
             visibility: cross.default_visibility,
             color: cross.color,
@@ -297,13 +305,12 @@ export default {
       }
     }
 
-    window.APIClient.joinGame(this.room);
-    window.APIClient.on("message", (player, msg) => {
-      // eslint-disable-next-line
-      console.log("NEW MESSAGE");
-      // eslint-disable-next-line
-      console.log(msg);
-      vm.games.morpion = msg;
+    window.APIClient.on("connect", () => {
+      window.APIClient.joinGame(this.room);
+    })
+    window.APIClient.on("update", (player, info) => {
+      console.log(info);
+      vm.games.morpion = info;
     });
   },
   methods: {
@@ -319,6 +326,8 @@ export default {
           vm.updateObjectVisibility(objId, "cross", false);
         }
       }
+      this.games.morpion.params.circle.n_checked = 0;
+      this.games.morpion.params.cross.n_checked = 0;
     },
     // update object visibility
     updateObjectVisibility(objId, objectType, visibility) {
@@ -329,7 +338,7 @@ export default {
           this.games.morpion[objectType][c].visibility = visibility;
         }
       }
-      window.APIClient.sendMessage(vm.games.morpion);
+      window.APIClient.sendGameUpdate(vm.games.morpion);
     },
     // update Morpion
     updateMorpion(event) {
@@ -343,6 +352,10 @@ export default {
       } else {
         selectedObjectType = "cross";
       }
+      let n_cell = this.games.morpion.params.n_cell;
+      if(this.games.morpion.params.circle.n_checked + this.games.morpion.params.cross.n_checked === n_cell * n_cell) {
+        selectedObjectType = "";
+      }
 
       if(selectedObjectType !== "") {
         this.updateObjectVisibility(
@@ -353,7 +366,7 @@ export default {
         this.games.morpion.params[selectedObjectType].n_checked++;
       }
 
-      window.APIClient.sendMessage(vm.games.morpion);
+      window.APIClient.sendGameUpdate(vm.games.morpion);
     }
   }
 };

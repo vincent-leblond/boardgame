@@ -246,74 +246,79 @@ export default {
   mounted() {
     let vm = this;
 
-    // draw morpion board
-    let size = this.games.morpion.params.size;
-    let cross = this.games.morpion.params.cross;
-    let circle = this.games.morpion.params.circle;
-    let n_cell = this.games.morpion.params.n_cell;
-    let left_margin = this.games.morpion.params.left_margin;
-    let top_margin = this.games.morpion.params.top_margin;
-    for(let row=0;row<n_cell;row++) {
-      for(let col=0;col<n_cell;col++) {
-        this.games.morpion.board.push(
-          {
-            id: "board_" + row + "_" + col,
-            x: row * size + left_margin,
-            y: col * size + top_margin,
-            width: size,
-            height: size,
-            visibility: true
-          }
-        );
+    this.drawMorpion();
 
-        this.games.morpion.circle.push(
-          {
-            id: "circle_" + row + "_" + col,
-            cx: (row + 0.5) * size + left_margin,
-            cy: (col + 0.5) * size + top_margin,
-            r: size / circle.proportion,
-            visibility: circle.default_visibility,
-            color: circle.color,
-            size: circle.size
-          }
-        );
-
-        this.games.morpion.cross.push(
-          {
-            id: "cross_" + row + "_" + col,
-            x1: [
-              row * size + cross.margin + left_margin,
-              row * size + cross.margin + left_margin,
-              ],
-            x2: [
-              (row + 1) * size - cross.margin + left_margin,
-              (row + 1) * size - cross.margin + left_margin,
-            ],
-            y1: [
-              col * size + cross.margin + top_margin,
-              (col + 1) * size - cross.margin + top_margin
-            ],
-            y2: [
-              (col + 1) * size - cross.margin + top_margin,
-              col * size + cross.margin + top_margin
-            ],
-            visibility: cross.default_visibility,
-            color: cross.color,
-            size: cross.size
-          }
-        )
-      }
-    }
-
+    // join game on connect
     window.APIClient.on("connect", () => {
       window.APIClient.joinGame(this.room);
     })
+    // game update listener
     window.APIClient.on("update", (player, info) => {
-      console.log(info);
       vm.games.morpion = info;
     });
   },
   methods: {
+    // draw Morpion game board
+    drawMorpion() {
+      // draw morpion board
+      let size = this.games.morpion.params.size;
+      let cross = this.games.morpion.params.cross;
+      let circle = this.games.morpion.params.circle;
+      let n_cell = this.games.morpion.params.n_cell;
+      let left_margin = this.games.morpion.params.left_margin;
+      let top_margin = this.games.morpion.params.top_margin;
+      for(let row=0;row<n_cell;row++) {
+        for(let col=0;col<n_cell;col++) {
+          this.games.morpion.board.push(
+            {
+              id: "board_" + (row + 1) + "_" + (col + 1),
+              x: row * size + left_margin,
+              y: col * size + top_margin,
+              width: size,
+              height: size,
+              visibility: true
+            }
+          );
+
+          this.games.morpion.circle.push(
+            {
+              id: "circle_" + (row + 1) + "_" + (col + 1),
+              cx: (row + 0.5) * size + left_margin,
+              cy: (col + 0.5) * size + top_margin,
+              r: size / circle.proportion,
+              visibility: circle.default_visibility,
+              color: circle.color,
+              size: circle.size
+            }
+          );
+
+          this.games.morpion.cross.push(
+            {
+              id: "cross_" + (row + 1) + "_" + (col + 1),
+              x1: [
+                row * size + cross.margin + left_margin,
+                row * size + cross.margin + left_margin,
+                ],
+              x2: [
+                (row + 1) * size - cross.margin + left_margin,
+                (row + 1) * size - cross.margin + left_margin,
+              ],
+              y1: [
+                col * size + cross.margin + top_margin,
+                (col + 1) * size - cross.margin + top_margin
+              ],
+              y2: [
+                (col + 1) * size - cross.margin + top_margin,
+                col * size + cross.margin + top_margin
+              ],
+              visibility: cross.default_visibility,
+              color: cross.color,
+              size: cross.size
+            }
+          )
+        }
+      }
+    },
     // clear objects of Morpion
     clearMorpion() {
       let vm = this;
@@ -340,20 +345,30 @@ export default {
       }
       window.APIClient.sendGameUpdate(vm.games.morpion);
     },
-    // update Morpion
-    updateMorpion(event) {
-      let vm = this;
-      let board_id = event.currentTarget.id.split("_");
-
+    addObject(board_id) {
       let selectedObjectType = "";
 
+      // get object type to add
       if(this.games.morpion.params.circle.n_checked === this.games.morpion.params.cross.n_checked) {
         selectedObjectType = "circle";
       } else {
         selectedObjectType = "cross";
       }
+
+      // no new object if all filled
       let n_cell = this.games.morpion.params.n_cell;
       if(this.games.morpion.params.circle.n_checked + this.games.morpion.params.cross.n_checked === n_cell * n_cell) {
+        selectedObjectType = "";
+      }
+
+      // if there is already an object
+      let circle_visibility = this.games.morpion.circle.filter(
+        d => d.id === "circle_" + board_id[1] + "_" + board_id[2]
+        )[0].visibility;
+      let cross_visibility = this.games.morpion.cross.filter(
+        d => d.id === "cross_" + board_id[1] + "_" + board_id[2]
+        )[0].visibility;
+      if(circle_visibility || cross_visibility) {
         selectedObjectType = "";
       }
 
@@ -365,7 +380,14 @@ export default {
         );
         this.games.morpion.params[selectedObjectType].n_checked++;
       }
+    },
+    // update Morpion
+    updateMorpion(event) {
+      let vm = this;
 
+      let board_id = event.currentTarget.id.split("_");
+
+      vm.addObject(board_id);
       window.APIClient.sendGameUpdate(vm.games.morpion);
     }
   }

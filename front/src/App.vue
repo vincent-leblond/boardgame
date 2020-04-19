@@ -339,6 +339,7 @@ export default {
       this.games.morpion.params.cross.n_checked = 0;
 
       this.games.morpion.params.end_game_msg = "";
+      window.APIClient.sendGameUpdate(vm.games.morpion);
     },
     // update object visibility
     updateObjectVisibility(objId, objectType, visibility) {

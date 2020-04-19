@@ -146,6 +146,7 @@
                       </template>
                       <span>Effacer</span>
                     </v-tooltip>
+                    {{ games.morpion.params.end_game_msg }}
                   </v-card>
                 </v-col>
               </v-row>
@@ -175,6 +176,7 @@ export default {
       games: {
         morpion: {
           params: {
+            end_game_msg: "",
             n_cell: 3,
             size: 100,
             svg_size: 350,
@@ -184,6 +186,7 @@ export default {
               default_visibility: true
             },
             cross: {
+              public_name: "croix",
               margin: 15,
               color: "#0000FF",
               size: "4",
@@ -191,6 +194,7 @@ export default {
               n_checked: 0
             },
             circle: {
+              public_name: "cercle",
               proportion: 2.5,
               color: "#FF0000",
               size: "3",
@@ -333,6 +337,8 @@ export default {
       }
       this.games.morpion.params.circle.n_checked = 0;
       this.games.morpion.params.cross.n_checked = 0;
+
+      this.games.morpion.params.end_game_msg = "";
     },
     // update object visibility
     updateObjectVisibility(objId, objectType, visibility) {
@@ -345,6 +351,7 @@ export default {
       }
       window.APIClient.sendGameUpdate(vm.games.morpion);
     },
+    // add an object on board
     addObject(board_id) {
       let selectedObjectType = "";
 
@@ -380,6 +387,7 @@ export default {
         );
         this.games.morpion.params[selectedObjectType].n_checked++;
       }
+      return selectedObjectType;
     },
     // update Morpion
     updateMorpion(event) {
@@ -387,8 +395,61 @@ export default {
 
       let board_id = event.currentTarget.id.split("_");
 
-      vm.addObject(board_id);
-      window.APIClient.sendGameUpdate(vm.games.morpion);
+      // detect winner or draw
+      if(this.games.morpion.params.end_game_msg === "") {
+        let selectedObjectType = vm.addObject(board_id);
+
+        // check if win or draw
+        let row_cell = parseInt(board_id[1]);
+        let col_cell = parseInt(board_id[2]);
+
+        let objects = this.games.morpion[selectedObjectType];
+
+        let public_name = this.games.morpion.params[selectedObjectType].public_name;
+
+        // vertical
+        let obj1 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_1")[0].visibility;
+        let obj2 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_2")[0].visibility;
+        let obj3 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_3")[0].visibility;
+        if(obj1 && obj2 && obj3) {
+          this.games.morpion.params.end_game_msg = "Victoire de " + public_name; 
+        }
+
+        // horizontal
+        obj1 = objects.filter(d => d.id === selectedObjectType + "_1_" + col_cell)[0].visibility;
+        obj2 = objects.filter(d => d.id === selectedObjectType + "_2_" + col_cell)[0].visibility;
+        obj3 = objects.filter(d => d.id === selectedObjectType + "_3_" + col_cell)[0].visibility;
+        if(obj1 && obj2 && obj3) {
+          this.games.morpion.params.end_game_msg = "Victoire de " + public_name; 
+        }
+
+        // diagonal 1 descendant
+        obj1 = objects.filter(d => d.id === selectedObjectType + "_1_1")[0].visibility;
+        obj2 = objects.filter(d => d.id === selectedObjectType + "_2_2")[0].visibility;
+        obj3 = objects.filter(d => d.id === selectedObjectType + "_3_3")[0].visibility;
+        if(obj1 && obj2 && obj3) {
+          this.games.morpion.params.end_game_msg = "Victoire de " + public_name; 
+        }
+
+        // diagonal 2 ascendant
+        obj1 = objects.filter(d => d.id === selectedObjectType + "_1_3")[0].visibility;
+        obj2 = objects.filter(d => d.id === selectedObjectType + "_2_2")[0].visibility;
+        obj3 = objects.filter(d => d.id === selectedObjectType + "_3_1")[0].visibility;
+        if(obj1 && obj2 && obj3) {
+          this.games.morpion.params.end_game_msg = "Victoire de " + public_name; 
+        }
+        
+        // all filled
+        if(this.games.morpion.params.end_game_msg === "") {
+          let n_cell = this.games.morpion.params.n_cell;
+          if(this.games.morpion.params.circle.n_checked + this.games.morpion.params.cross.n_checked === n_cell * n_cell) {
+            this.games.morpion.params.end_game_msg = "Fin de partie : égalité";
+          }
+        }
+
+        // send game update
+        window.APIClient.sendGameUpdate(vm.games.morpion);
+      }
     }
   }
 };

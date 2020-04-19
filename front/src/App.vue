@@ -27,9 +27,22 @@
       class="elevation-1"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
-      width="620px"
+      v-model="drawer"
+      width="150px"
     >
-      <v-container v-if="visio">
+      <v-list dense>
+        <v-list-item link @click="tabModel=0">
+          <v-list-item-content>
+            <v-list-item-title>Morpion</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link @click="tabModel=1">
+          <v-list-item-content>
+            <v-list-item-title>Test</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+<!--       <v-container v-if="visio">
         <iframe
             
             id="myIframe"
@@ -38,7 +51,7 @@
             height="400"
             :src="'https://meet.jit.si/' + room"
         ></iframe>
-      </v-container>
+      </v-container> -->
     </v-navigation-drawer>
 
     <v-app-bar
@@ -48,30 +61,28 @@
       color="primary"
       dark
     >
-      <v-toolbar-title style="width: 400px" class="ml-0 pl-4">
-        <span class="hidden-sm-and-down">
-          Jeux d'enfants
-        </span>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn
+            color="white"
+            @click.stop="drawer = !drawer"
+            v-on="on"
+            icon
+          >
+            <v-icon large>view_headline</v-icon>
+          </v-btn>
+        </template>
+        <span>Effacer</span>
+      </v-tooltip>
+      <v-toolbar-title class="ml-0 pl-4">
+        Jeux d'enfants
       </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-items class="hidden-sm-and-down">
-        <v-tabs
-          v-model="tabModel"
-          centered
-          slider-color="secondary"
-          background-color="transparent"
-          class="pt-1"
-        >
-          <v-tab>Morpion</v-tab>
-          <!-- <v-tab>Jeu 2</v-tab> -->
-        </v-tabs>
-      </v-toolbar-items>
     </v-app-bar>
 
     <v-content>
       <v-container fluid fill-height class="pa-0">
         <v-tabs-items v-model="tabModel" style="height: 100%; width: 100%">
-          <!-- TAB 1 -->
+          <!-- TAB 0 -->
           <v-tab-item style="height: 100%">
             <v-container fluid>
               <v-row>
@@ -152,10 +163,10 @@
               </v-row>
             </v-container>
           </v-tab-item>
-          <!-- TAB 2 -->
+          <!-- TAB 1 -->
           <v-tab-item style="height: 100%">
             <v-container fluid>
-              Jeu 2
+              Test
             </v-container>
           </v-tab-item>
         </v-tabs-items>
@@ -172,6 +183,7 @@ export default {
   },
   data() {
     return {
+      drawer: null,
       items: [],
       games: {
         morpion: {

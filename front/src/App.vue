@@ -88,76 +88,89 @@
               <v-row>
                 <v-col col="6" md="6">
                   <v-card class="pa-0">
-                    <div class="ma-n2" id="morpionboard">
-                      <svg
-                        :width="games.morpion.params.svg_size"
-                        :height="games.morpion.params.svg_size"
-                        id="svgMorpionBoard">
-                        <!-- add board -->
-                        <g v-for="item in games.morpion.board" :key="item.id">
-                          <rect
-                            v-show="item.visibility"
-                            :id="item.id"
-                            :x="item.x"
-                            :y="item.y"
-                            :width="item.width"
-                            :height="item.height"
-                            style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
-                            @click="updateMorpion"
-                          />
-                        </g>
-                        <!-- add cicles -->
-                        <g v-for="item in games.morpion.circle" :key="item.id">
-                          <circle
-                            v-show="item.visibility"
-                            :id="item.id"
-                            :cx="item.cx"
-                            :cy="item.cy"
-                            :r="item.r"
-                            :stroke="item.color"
-                            stroke-width="4"
-                            fill="none"
-                          />
-                        </g>
-                        <!-- add cross -->
-                        <g v-for="item in games.morpion.cross" :key="item.id">
-                          <g :id="item.id" v-show="item.visibility">
-                            <line
-                              v-show="item.visibility"
-                              :x1="item.x1[0]"
-                              :y1="item.y1[0]"
-                              :x2="item.x2[0]"
-                              :y2="item.y2[0]"
-                              :stroke="item.color"
-                              :stroke-width="item.size"
-                            />
-                            <line
-                              v-show="item.visibility"
-                              :x1="item.x1[1]"
-                              :y1="item.y1[1]"
-                              :x2="item.x2[1]"
-                              :y2="item.y2[1]"
-                              :stroke="item.color"
-                              :stroke-width="item.size"
-                            />
-                          </g>
-                        </g>
-                      </svg>
-                    </div>
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          color="primary"
-                          @click="clearMorpion"
-                          v-on="on"
-                          icon
-                        >
-                          <v-icon large>close</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>Effacer</span>
-                    </v-tooltip>
-                    {{ games.morpion.params.end_game_msg }}
+<!--                     <row>
+                      <v-col col="2" md="2">
+                        <v-select
+                          v-model="screen"
+                          :items="choice_screen"
+                          label="Jeu à distance"
+                        ></v-select>
+                      </v-col>
+                    </row> -->
+                    <v-row>
+                      <v-col col="12" md="12">
+                        <div class="ma-n2" id="morpionboard">
+                          <svg
+                            :width="games.morpion.params.svg_size"
+                            :height="games.morpion.params.svg_size"
+                            id="svgMorpionBoard">
+                            <!-- add board -->
+                            <g v-for="item in games.morpion.board" :key="item.id">
+                              <rect
+                                v-show="item.visibility"
+                                :id="item.id"
+                                :x="item.x"
+                                :y="item.y"
+                                :width="item.width"
+                                :height="item.height"
+                                style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
+                                @click="updateMorpion"
+                              />
+                            </g>
+                            <!-- add cicles -->
+                            <g v-for="item in games.morpion.circle" :key="item.id">
+                              <circle
+                                v-show="item.visibility"
+                                :id="item.id"
+                                :cx="item.cx"
+                                :cy="item.cy"
+                                :r="item.r"
+                                :stroke="item.color"
+                                stroke-width="4"
+                                fill="none"
+                              />
+                            </g>
+                            <!-- add cross -->
+                            <g v-for="item in games.morpion.cross" :key="item.id">
+                              <g :id="item.id" v-show="item.visibility">
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[0]"
+                                  :y1="item.y1[0]"
+                                  :x2="item.x2[0]"
+                                  :y2="item.y2[0]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[1]"
+                                  :y1="item.y1[1]"
+                                  :x2="item.x2[1]"
+                                  :y2="item.y2[1]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                              </g>
+                            </g>
+                          </svg>
+                        </div>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              color="primary"
+                              @click="clearMorpion"
+                              v-on="on"
+                              icon
+                            >
+                              <v-icon large>close</v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Effacer</span>
+                        </v-tooltip>
+                        {{ games.morpion.params.end_game_msg }}
+                      </v-col>
+                    </v-row>
                   </v-card>
                 </v-col>
               </v-row>
@@ -183,6 +196,8 @@ export default {
   },
   data() {
     return {
+      choice_screen: ["oui", "non"],
+      screen: "oui",
       drawer: null,
       items: [],
       games: {
@@ -223,7 +238,7 @@ export default {
       error_msg: "",
 
       visio: true,
-      tabModel: null,
+      tabModel: 0,
       isLoading: false,
       errormsg: "",
       tab: null,

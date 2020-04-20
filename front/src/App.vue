@@ -109,20 +109,28 @@
                           </g>
                           <!-- add cicles -->
                           <g v-for="item in games.morpion.circle" :key="item.id">
-                            <circle
+                            <g
                               v-show="item.visibility"
                               :id="item.id"
-                              :cx="item.cx"
-                              :cy="item.cy"
-                              :r="item.r"
-                              :stroke="item.color"
-                              stroke-width="4"
-                              fill="none"
-                            />
+                              :transform="'translate(' + item.x + ', ' + item.y + ')'"
+                            >
+                              <circle
+                                :cx="item.cx"
+                                :cy="item.cy"
+                                :r="item.r"
+                                :stroke="item.color"
+                                stroke-width="4"
+                                fill="none"
+                              />
+                            </g>
                           </g>
                           <!-- add cross -->
                           <g v-for="item in games.morpion.cross" :key="item.id">
-                            <g :id="item.id" v-show="item.visibility">
+                            <g
+                              :id="item.id"
+                              v-show="item.visibility"
+                              :transform="'translate(' + item.x + ', ' + item.y + ')'"
+                            >
                               <line
                                 v-show="item.visibility"
                                 :x1="item.x1[0]"
@@ -318,8 +326,10 @@ export default {
           this.games.morpion.circle.push(
             {
               id: "circle_" + (row + 1) + "_" + (col + 1),
-              cx: (row + 0.5) * size + left_margin,
-              cy: (col + 0.5) * size + top_margin,
+              cx: size / 2, //(row + 0.5) * size + left_margin,
+              cy: size / 2, //(col + 0.5) * size + top_margin,
+              x: row * size + left_margin,
+              y: col * size + top_margin,
               r: size / circle.proportion,
               visibility: circle.default_visibility,
               color: circle.color,
@@ -330,21 +340,23 @@ export default {
           this.games.morpion.cross.push(
             {
               id: "cross_" + (row + 1) + "_" + (col + 1),
+              x: row * size + left_margin,
+              y: col * size + top_margin,
               x1: [
-                row * size + cross.margin + left_margin,
-                row * size + cross.margin + left_margin,
+                cross.margin,
+                cross.margin
                 ],
               x2: [
-                (row + 1) * size - cross.margin + left_margin,
-                (row + 1) * size - cross.margin + left_margin,
+                size - cross.margin,
+                size - cross.margin
               ],
               y1: [
-                col * size + cross.margin + top_margin,
-                (col + 1) * size - cross.margin + top_margin
+                cross.margin,
+                size - cross.margin
               ],
               y2: [
-                (col + 1) * size - cross.margin + top_margin,
-                col * size + cross.margin + top_margin
+                size - cross.margin,
+                cross.margin
               ],
               visibility: cross.default_visibility,
               color: cross.color,

@@ -114,6 +114,12 @@
                               :id="item.id"
                               :transform="'translate(' + item.x + ', ' + item.y + ')'"
                             >
+                              <image
+                                href="https://www.pokepedia.fr/images/thumb/archive/e/e7/20141118205626%21Pikachu-RFVF.png/120px-Pikachu-RFVF.png"
+                                x="5" y="5"
+                                height="90px" width="90px"
+                                v-if="games.morpion.params.mode_morpion==='pokemon'"
+                              />
                               <circle
                                 :cx="item.cx"
                                 :cy="item.cy"
@@ -121,6 +127,7 @@
                                 :stroke="item.color"
                                 stroke-width="4"
                                 fill="none"
+                                v-if="games.morpion.params.mode_morpion==='normal'"
                               />
                             </g>
                           </g>
@@ -131,24 +138,32 @@
                               v-show="item.visibility"
                               :transform="'translate(' + item.x + ', ' + item.y + ')'"
                             >
-                              <line
-                                v-show="item.visibility"
-                                :x1="item.x1[0]"
-                                :y1="item.y1[0]"
-                                :x2="item.x2[0]"
-                                :y2="item.y2[0]"
-                                :stroke="item.color"
-                                :stroke-width="item.size"
+                              <image
+                                href="https://www.pokepedia.fr/images/thumb/2/24/Tortank-RFVF.png/552px-Tortank-RFVF.png"
+                                x="5" y="5"
+                                height="90px" width="90px"
+                                v-if="games.morpion.params.mode_morpion==='pokemon'"
                               />
-                              <line
-                                v-show="item.visibility"
-                                :x1="item.x1[1]"
-                                :y1="item.y1[1]"
-                                :x2="item.x2[1]"
-                                :y2="item.y2[1]"
-                                :stroke="item.color"
-                                :stroke-width="item.size"
-                              />
+                              <g v-if="games.morpion.params.mode_morpion==='normal'">
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[0]"
+                                  :y1="item.y1[0]"
+                                  :x2="item.x2[0]"
+                                  :y2="item.y2[0]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[1]"
+                                  :y1="item.y1[1]"
+                                  :x2="item.x2[1]"
+                                  :y2="item.y2[1]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                              </g>
                             </g>
                           </g>
                         </svg>
@@ -207,11 +222,15 @@ export default {
             svg_size: 350,
             left_margin: 20,
             top_margin: 20,
+            mode: "normal",
             board: {
               default_visibility: true
             },
             cross: {
-              public_name: "croix",
+              public_name: {
+                normal: "croix",
+                pokemon: "Tortank"
+              },
               margin: 15,
               color: "#0000FF",
               size: "4",
@@ -219,7 +238,10 @@ export default {
               n_checked: 0
             },
             circle: {
-              public_name: "cercle",
+              public_name: {
+                normal: "cercle",
+                pokemon: "Pikachu"
+              },
               proportion: 2.5,
               color: "#FF0000",
               size: "3",
@@ -254,6 +276,7 @@ export default {
     let room = params.get("room");
     let visio = params.get("visio");
     let one_screen = params.get("one_screen");
+    let mode_morpion = params.get("mode_morpion");
 
     if(visio === undefined) {
       vm.visio = true;
@@ -277,6 +300,12 @@ export default {
       } else {
         vm.one_screen = false;
       }
+    }
+
+    if(mode_morpion !== null) {
+      this.games.morpion.params.mode_morpion = mode_morpion;
+    } else {
+      this.games.morpion.params.mode_morpion = "normal";
     }
   },
   computed: {
@@ -473,7 +502,9 @@ export default {
 
           let objects = this.games.morpion[selectedObjectType];
 
-          let public_name = this.games.morpion.params[selectedObjectType].public_name;
+          let public_name = this.games.morpion.params[selectedObjectType].public_name[
+            this.games.morpion.params.mode_morpion
+          ];
 
           // vertical
           let obj1 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_1")[0].visibility;

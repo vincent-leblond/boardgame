@@ -96,16 +96,18 @@
                           id="svgMorpionBoard">
                           <!-- add board -->
                           <g v-for="item in games.morpion.board" :key="item.id">
-                            <rect
-                              v-show="item.visibility"
-                              :id="item.id"
-                              :x="item.x"
-                              :y="item.y"
-                              :width="item.width"
-                              :height="item.height"
-                              style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
-                              @click="updateMorpion($event, '')"
-                            />
+                            <g :transform="'translate(' + item.x + ', ' + item.y + ')'">
+                              <rect
+                                v-show="item.visibility"
+                                :id="item.id"
+                                x="0"
+                                y="0"
+                                :width="item.width"
+                                :height="item.height"
+                                style="fill-opacity:0;stroke-width:3;stroke:rgb(0,0,0)"
+                                @click="updateMorpion($event, '')"
+                              />
+                            </g>
                           </g>
                           <!-- add cicles -->
                           <g v-for="item in games.morpion.circle" :key="item.id">
@@ -222,16 +224,21 @@
                           id="svgMorpionBoard">
                           <!-- add board -->
                           <g v-for="item in games.morpion_calcul.board" :key="item.id">
-                            <rect
-                              v-show="item.visibility"
-                              :id="item.id"
-                              :x="item.x"
-                              :y="item.y"
-                              :width="item.width"
-                              :height="item.height"
-                              style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
-                              @click="updateMorpion($event, 'calcul')"
-                            />
+                            <g :transform="'translate(' + item.x + ', ' + item.y + ')'">
+                              <text :x="item.width*0.4" :y="item.width*0.6" font-size="40px">
+                                {{ item.num }}
+                              </text>
+                              <rect
+                                v-show="item.visibility"
+                                :id="item.id"
+                                x="0"
+                                y="0"
+                                :width="item.width"
+                                :height="item.height"
+                                style="fill-opacity:0;stroke-width:3;stroke:rgb(0,0,0)"
+                                @click="updateMorpion($event, 'calcul')"
+                              />
+                            </g>
                           </g>
                           <!-- add cicles -->
                           <g v-for="item in games.morpion_calcul.circle" :key="item.id">
@@ -499,14 +506,16 @@ export default {
     });
   },
   methods: {
-    //
+    // launch dice
     launch_die(game, number) {
+      let vm = this;
       if(number == 2) {
         this.games[game].params.dice = [
           Math.floor(Math.random() * 6 + 1),
           Math.floor(Math.random() * 6 + 1)
         ]
       }
+      window.APIClient.sendGameUpdate(vm.games[game]);
     },
     // draw Morpion game board
     drawMorpion() {
@@ -536,7 +545,8 @@ export default {
                 y: col * size + top_margin,
                 width: size,
                 height: size,
-                visibility: true
+                visibility: true,
+                num: (row + 1) + col * n_cell
               }
             );
 
@@ -693,17 +703,32 @@ export default {
         t = "morpion_" + type;
       }
 
+      let n_cell = this.games[t].params.n_cell;
       let board_id = event.currentTarget.id.split("_");
+      let row_cell = parseInt(board_id[1]);
+      let col_cell = parseInt(board_id[2]);
 
+      let row = row_cell - 1;
+      let col = col_cell - 1;
+      let cell_num = (row + 1) + col * n_cell;
+
+      // check allowed to add object
       // detect winner or draw
       if(this.games[t].params.end_game_msg === "") {
-        let selectedObjectType = this.addObject(board_id, t);
+        let selectedObjectType = "";
+        // check if allowed to add an object
+        if(type === "calcul") {
+          let dice1 = this.games[t].params.dice[0];
+          let dice2 = this.games[t].params.dice[1];
+          if(cell_num === (dice1 - dice2) || cell_num === (dice2 - dice1) || cell_num === (dice1 + dice2)) {
+            selectedObjectType = this.addObject(board_id, t)
+          }
+        } else {
+          selectedObjectType = this.addObject(board_id, t);
+        }
 
         if(selectedObjectType !== "") {
           // check if win or draw
-          let row_cell = parseInt(board_id[1]);
-          let col_cell = parseInt(board_id[2]);
-
           let objects = this.games[t][selectedObjectType];
 
           let public_name = this.games[t].params[selectedObjectType].public_name[
@@ -744,7 +769,6 @@ export default {
           
           // all filled
           if(this.games[t].params.end_game_msg === "") {
-            let n_cell = this.games[t].params.n_cell;
             if(this.games[t].params.circle.n_checked + this.games[t].params.cross.n_checked === n_cell * n_cell) {
               this.games[t].params.end_game_msg = "Fin de partie : égalité";
             }

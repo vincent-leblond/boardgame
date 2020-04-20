@@ -38,7 +38,7 @@
         </v-list-item>
         <v-list-item link @click="tabModel=1">
           <v-list-item-content>
-            <v-list-item-title>Test</v-list-item-title>
+            <v-list-item-title>Morpion calcul</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -104,7 +104,7 @@
                               :width="item.width"
                               :height="item.height"
                               style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
-                              @click="updateMorpion"
+                              @click="updateMorpion($event, '')"
                             />
                           </g>
                           <!-- add cicles -->
@@ -168,15 +168,18 @@
                           </g>
                         </svg>
                       </div>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col col="12" md="12">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                           <v-btn
                             color="primary"
-                            @click="clearMorpion"
+                            @click="clearMorpion('')"
                             v-on="on"
-                            icon
                           >
-                            <v-icon large>replay</v-icon>
+                            Rejouer
                           </v-btn>
                         </template>
                         <span>Rejouer</span>
@@ -191,7 +194,127 @@
           <!-- TAB 1 -->
           <v-tab-item style="height: 100%">
             <v-container fluid>
-              Test
+              <v-row>
+                <v-col col="6" md="6">
+                  <v-row>
+                    <v-col col="2" md="2">
+                      <v-btn color="primary" @click="launch_die('morpion_calcul', 2)">Lancer</v-btn>
+                    </v-col>
+                    <v-col col="1" md="1">
+                      <img
+                        :src="'static/Dice-' + games.morpion_calcul.params.dice[0] + '.svg'"
+                        height="42" width="42"
+                      > 
+                    </v-col>
+                    <v-col col="1" md="1">
+                      <img
+                        :src="'static/Dice-' + games.morpion_calcul.params.dice[1] + '.svg'"
+                        height="42" width="42"
+                      > 
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col col="12" md="12">
+                      <div class="ma-n2" id="morpionboard">
+                        <svg
+                          :width="games.morpion_calcul.params.svg_size"
+                          :height="games.morpion_calcul.params.svg_size"
+                          id="svgMorpionBoard">
+                          <!-- add board -->
+                          <g v-for="item in games.morpion_calcul.board" :key="item.id">
+                            <rect
+                              v-show="item.visibility"
+                              :id="item.id"
+                              :x="item.x"
+                              :y="item.y"
+                              :width="item.width"
+                              :height="item.height"
+                              style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"
+                              @click="updateMorpion($event, 'calcul')"
+                            />
+                          </g>
+                          <!-- add cicles -->
+                          <g v-for="item in games.morpion_calcul.circle" :key="item.id">
+                            <g
+                              v-show="item.visibility"
+                              :id="item.id"
+                              :transform="'translate(' + item.x + ', ' + item.y + ')'"
+                            >
+                              <image
+                                href="https://www.pokepedia.fr/images/thumb/archive/e/e7/20141118205626%21Pikachu-RFVF.png/120px-Pikachu-RFVF.png"
+                                x="5" y="5"
+                                height="90px" width="90px"
+                                v-if="games.morpion_calcul.params.mode_morpion==='pokemon'"
+                              />
+                              <circle
+                                :cx="item.cx"
+                                :cy="item.cy"
+                                :r="item.r"
+                                :stroke="item.color"
+                                stroke-width="4"
+                                fill="none"
+                                v-if="games.morpion_calcul.params.mode_morpion==='normal'"
+                              />
+                            </g>
+                          </g>
+                          <!-- add cross -->
+                          <g v-for="item in games.morpion_calcul.cross" :key="item.id">
+                            <g
+                              :id="item.id"
+                              v-show="item.visibility"
+                              :transform="'translate(' + item.x + ', ' + item.y + ')'"
+                            >
+                              <image
+                                href="https://www.pokepedia.fr/images/thumb/2/24/Tortank-RFVF.png/552px-Tortank-RFVF.png"
+                                x="5" y="5"
+                                height="90px" width="90px"
+                                v-if="games.morpion_calcul.params.mode_morpion==='pokemon'"
+                              />
+                              <g v-if="games.morpion_calcul.params.mode_morpion==='normal'">
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[0]"
+                                  :y1="item.y1[0]"
+                                  :x2="item.x2[0]"
+                                  :y2="item.y2[0]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                                <line
+                                  v-show="item.visibility"
+                                  :x1="item.x1[1]"
+                                  :y1="item.y1[1]"
+                                  :x2="item.x2[1]"
+                                  :y2="item.y2[1]"
+                                  :stroke="item.color"
+                                  :stroke-width="item.size"
+                                />
+                              </g>
+                            </g>
+                          </g>
+                        </svg>
+                      </div>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col col="12" md="12">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="primary"
+                            @click="clearMorpion('calcul')"
+                            v-on="on"
+                          >
+                            Rejouer
+                          </v-btn>
+                        </template>
+                        <span>Rejouer</span>
+                      </v-tooltip>
+                      {{ games.morpion_calcul.params.end_game_msg }}
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
             </v-container>
           </v-tab-item>
         </v-tabs-items>
@@ -216,6 +339,47 @@ export default {
         morpion: {
           morpion: "name",
           params: {
+            end_game_msg: "",
+            n_cell: 3,
+            size: 100,
+            svg_size: 350,
+            left_margin: 20,
+            top_margin: 20,
+            mode: "normal",
+            board: {
+              default_visibility: true
+            },
+            cross: {
+              public_name: {
+                normal: "croix",
+                pokemon: "Tortank"
+              },
+              margin: 15,
+              color: "#0000FF",
+              size: "4",
+              default_visibility: false,
+              n_checked: 0
+            },
+            circle: {
+              public_name: {
+                normal: "cercle",
+                pokemon: "Pikachu"
+              },
+              proportion: 2.5,
+              color: "#FF0000",
+              size: "3",
+              default_visibility: false,
+              n_checked: 0
+            }
+          },
+          board: [],
+          circle: [],
+          cross: []
+        },
+        morpion_calcul: {
+          morpion_calcul: "name",
+          params: {
+            dice: [1, 1],
             end_game_msg: "",
             n_cell: 3,
             size: 100,
@@ -304,8 +468,10 @@ export default {
 
     if(mode_morpion !== null) {
       this.games.morpion.params.mode_morpion = mode_morpion;
+      this.games.morpion_calcul.params.mode_morpion = mode_morpion;
     } else {
       this.games.morpion.params.mode_morpion = "normal";
+      this.games.morpion_calcul.params.mode_morpion = "normal";
     }
   },
   computed: {
@@ -324,151 +490,181 @@ export default {
       if(Object.keys(info).indexOf("morpion") > -1) {
         vm.games.morpion = info;
       }
+      if(Object.keys(info).indexOf("morpion_calcul") > -1) {
+        vm.games.morpion_calcul = info;
+      }
       if(Object.keys(info).indexOf("player_order") > -1) {
         this.player_order = info.player_order;
       }
     });
   },
   methods: {
+    //
+    launch_die(game, number) {
+      if(number == 2) {
+        this.games[game].params.dice = [
+          Math.floor(Math.random() * 6 + 1),
+          Math.floor(Math.random() * 6 + 1)
+        ]
+      }
+    },
     // draw Morpion game board
     drawMorpion() {
-      // draw morpion board
-      let size = this.games.morpion.params.size;
-      let cross = this.games.morpion.params.cross;
-      let circle = this.games.morpion.params.circle;
-      let n_cell = this.games.morpion.params.n_cell;
-      let left_margin = this.games.morpion.params.left_margin;
-      let top_margin = this.games.morpion.params.top_margin;
-      for(let row=0;row<n_cell;row++) {
-        for(let col=0;col<n_cell;col++) {
-          this.games.morpion.board.push(
-            {
-              id: "board_" + (row + 1) + "_" + (col + 1),
-              x: row * size + left_margin,
-              y: col * size + top_margin,
-              width: size,
-              height: size,
-              visibility: true
-            }
-          );
+      let types = ["", "calcul"];
 
-          this.games.morpion.circle.push(
-            {
-              id: "circle_" + (row + 1) + "_" + (col + 1),
-              cx: size / 2, //(row + 0.5) * size + left_margin,
-              cy: size / 2, //(col + 0.5) * size + top_margin,
-              x: row * size + left_margin,
-              y: col * size + top_margin,
-              r: size / circle.proportion,
-              visibility: circle.default_visibility,
-              color: circle.color,
-              size: circle.size
-            }
-          );
+      for (const type of types) {
+        let t = "";
+        if(type === "") {
+          t = "morpion";
+        } else {
+          t = "morpion_" + type;
+        }
 
-          this.games.morpion.cross.push(
-            {
-              id: "cross_" + (row + 1) + "_" + (col + 1),
-              x: row * size + left_margin,
-              y: col * size + top_margin,
-              x1: [
-                cross.margin,
-                cross.margin
+        // draw morpion board
+        let size = this.games[t].params.size;
+        let cross = this.games[t].params.cross;
+        let circle = this.games[t].params.circle;
+        let n_cell = this.games[t].params.n_cell;
+        let left_margin = this.games[t].params.left_margin;
+        let top_margin = this.games[t].params.top_margin;
+        for(let row=0;row<n_cell;row++) {
+          for(let col=0;col<n_cell;col++) {
+            this.games[t].board.push(
+              {
+                id: "board_" + (row + 1) + "_" + (col + 1),
+                x: row * size + left_margin,
+                y: col * size + top_margin,
+                width: size,
+                height: size,
+                visibility: true
+              }
+            );
+
+            this.games[t].circle.push(
+              {
+                id: "circle_" + (row + 1) + "_" + (col + 1),
+                cx: size / 2, //(row + 0.5) * size + left_margin,
+                cy: size / 2, //(col + 0.5) * size + top_margin,
+                x: row * size + left_margin,
+                y: col * size + top_margin,
+                r: size / circle.proportion,
+                visibility: circle.default_visibility,
+                color: circle.color,
+                size: circle.size
+              }
+            );
+
+            this.games[t].cross.push(
+              {
+                id: "cross_" + (row + 1) + "_" + (col + 1),
+                x: row * size + left_margin,
+                y: col * size + top_margin,
+                x1: [
+                  cross.margin,
+                  cross.margin
+                  ],
+                x2: [
+                  size - cross.margin,
+                  size - cross.margin
                 ],
-              x2: [
-                size - cross.margin,
-                size - cross.margin
-              ],
-              y1: [
-                cross.margin,
-                size - cross.margin
-              ],
-              y2: [
-                size - cross.margin,
-                cross.margin
-              ],
-              visibility: cross.default_visibility,
-              color: cross.color,
-              size: cross.size
-            }
-          )
+                y1: [
+                  cross.margin,
+                  size - cross.margin
+                ],
+                y2: [
+                  size - cross.margin,
+                  cross.margin
+                ],
+                visibility: cross.default_visibility,
+                color: cross.color,
+                size: cross.size
+              }
+            )
+          }
         }
       }
     },
     // clear objects of Morpion
-    clearMorpion() {
+    clearMorpion(type) {
       let vm = this;
 
-      let n_cell = this.games.morpion.params.n_cell;
+      let t = "";
+      if(type === "") {
+        t = "morpion";
+      } else {
+        t = "morpion_" + type;
+      }
+
+      let n_cell = this.games[t].params.n_cell;
       for(let row=1;row<=n_cell;row++) {
         for(let col=1;col<=n_cell;col++) {
           let objId = row + "_" + col;
-          vm.updateObjectVisibility(objId, "circle", false);
-          vm.updateObjectVisibility(objId, "cross", false);
+          vm.updateObjectVisibility(objId, "circle", false, t);
+          vm.updateObjectVisibility(objId, "cross", false, t);
         }
       }
-      this.games.morpion.params.circle.n_checked = 0;
-      this.games.morpion.params.cross.n_checked = 0;
+      this.games[t].params.circle.n_checked = 0;
+      this.games[t].params.cross.n_checked = 0;
 
-      this.games.morpion.params.end_game_msg = "";
-      window.APIClient.sendGameUpdate(vm.games.morpion);
+      this.games[t].params.end_game_msg = "";
+      window.APIClient.sendGameUpdate(vm.games[t]);
       this.player_order = 0;
       window.APIClient.sendGameUpdate({player_order:0});
     },
     // update object visibility
-    updateObjectVisibility(objId, objectType, visibility) {
+    updateObjectVisibility(objId, objectType, visibility, t) {
       let vm = this;
-      
-      for(let c=0;c<this.games.morpion[objectType].length;c++) {
-        if(this.games.morpion[objectType][c].id === objectType + "_" + objId) {
-          this.games.morpion[objectType][c].visibility = visibility;
+
+      for(let c=0;c<this.games[t][objectType].length;c++) {
+        if(this.games[t][objectType][c].id === objectType + "_" + objId) {
+          this.games[t][objectType][c].visibility = visibility;
         }
       }
-      window.APIClient.sendGameUpdate(vm.games.morpion);
+      window.APIClient.sendGameUpdate(vm.games[t]);
     },
     // add an object on board
-    addObject(board_id) {
+    addObject(board_id, t) {
       let selectedObjectType = "";
 
       // get object type to add
       if(this.one_screen) {
-        if(this.games.morpion.params.circle.n_checked === this.games.morpion.params.cross.n_checked) {
+        if(this.games[t].params.circle.n_checked === this.games[t].params.cross.n_checked) {
           selectedObjectType = "circle";
         } else {
           selectedObjectType = "cross";
         }
       } else {
         // if game start
-        if(this.player_order === 0 && this.games.morpion.params.circle.n_checked === 0) {
+        if(this.player_order === 0 && this.games[t].params.circle.n_checked === 0) {
           selectedObjectType = "circle";
           this.player_order = 1;
-        } else if(this.player_order === 0 && this.games.morpion.params.circle.n_checked === 1) {
+        } else if(this.player_order === 0 && this.games[t].params.circle.n_checked === 1) {
           selectedObjectType = "cross";
           this.player_order = 2;
         } else if(this.player_order === 1) {
           selectedObjectType = "circle";
-          if(this.games.morpion.params.circle.n_checked > this.games.morpion.params.cross.n_checked) {
+          if(this.games[t].params.circle.n_checked > this.games[t].params.cross.n_checked) {
             selectedObjectType = "";
           }
         } else if(this.player_order === 2) {
           selectedObjectType = "cross";
-          if(this.games.morpion.params.circle.n_checked === this.games.morpion.params.cross.n_checked) {
+          if(this.games[t].params.circle.n_checked === this.games[t].params.cross.n_checked) {
             selectedObjectType = "";
           }
         }
       }
 
       // no new object if all filled
-      let n_cell = this.games.morpion.params.n_cell;
-      if(this.games.morpion.params.circle.n_checked + this.games.morpion.params.cross.n_checked === n_cell * n_cell) {
+      let n_cell = this.games[t].params.n_cell;
+      if(this.games[t].params.circle.n_checked + this.games[t].params.cross.n_checked === n_cell * n_cell) {
         selectedObjectType = "";
       }
 
       // if there is already an object
-      let circle_visibility = this.games.morpion.circle.filter(
+      let circle_visibility = this.games[t].circle.filter(
         d => d.id === "circle_" + board_id[1] + "_" + board_id[2]
         )[0].visibility;
-      let cross_visibility = this.games.morpion.cross.filter(
+      let cross_visibility = this.games[t].cross.filter(
         d => d.id === "cross_" + board_id[1] + "_" + board_id[2]
         )[0].visibility;
       if(circle_visibility || cross_visibility) {
@@ -479,31 +675,39 @@ export default {
         this.updateObjectVisibility(
           board_id[1] + "_" + board_id[2],
           selectedObjectType,
-          true
+          true,
+          t
         );
-        this.games.morpion.params[selectedObjectType].n_checked++;
+        this.games[t].params[selectedObjectType].n_checked++;
       }
       return selectedObjectType;
     },
     // update Morpion
-    updateMorpion(event) {
+    updateMorpion(event, type) {
       let vm = this;
+
+      let t = "";
+      if(type === "") {
+        t = "morpion";
+      } else {
+        t = "morpion_" + type;
+      }
 
       let board_id = event.currentTarget.id.split("_");
 
       // detect winner or draw
-      if(this.games.morpion.params.end_game_msg === "") {
-        let selectedObjectType = vm.addObject(board_id);
+      if(this.games[t].params.end_game_msg === "") {
+        let selectedObjectType = this.addObject(board_id, t);
 
         if(selectedObjectType !== "") {
           // check if win or draw
           let row_cell = parseInt(board_id[1]);
           let col_cell = parseInt(board_id[2]);
 
-          let objects = this.games.morpion[selectedObjectType];
+          let objects = this.games[t][selectedObjectType];
 
-          let public_name = this.games.morpion.params[selectedObjectType].public_name[
-            this.games.morpion.params.mode_morpion
+          let public_name = this.games[t].params[selectedObjectType].public_name[
+            this.games[t].params.mode_morpion
           ];
 
           // vertical
@@ -511,7 +715,7 @@ export default {
           let obj2 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_2")[0].visibility;
           let obj3 = objects.filter(d => d.id === selectedObjectType + "_" + row_cell + "_3")[0].visibility;
           if(obj1 && obj2 && obj3) {
-            this.games.morpion.params.end_game_msg = "Victoire de " + public_name;
+            this.games[t].params.end_game_msg = "Victoire de " + public_name;
           }
 
           // horizontal
@@ -519,7 +723,7 @@ export default {
           obj2 = objects.filter(d => d.id === selectedObjectType + "_2_" + col_cell)[0].visibility;
           obj3 = objects.filter(d => d.id === selectedObjectType + "_3_" + col_cell)[0].visibility;
           if(obj1 && obj2 && obj3) {
-            this.games.morpion.params.end_game_msg = "Victoire de " + public_name;
+            this.games[t].params.end_game_msg = "Victoire de " + public_name;
           }
 
           // diagonal 1 descendant
@@ -527,7 +731,7 @@ export default {
           obj2 = objects.filter(d => d.id === selectedObjectType + "_2_2")[0].visibility;
           obj3 = objects.filter(d => d.id === selectedObjectType + "_3_3")[0].visibility;
           if(obj1 && obj2 && obj3) {
-            this.games.morpion.params.end_game_msg = "Victoire de " + public_name;
+            this.games[t].params.end_game_msg = "Victoire de " + public_name;
           }
 
           // diagonal 2 ascendant
@@ -535,21 +739,21 @@ export default {
           obj2 = objects.filter(d => d.id === selectedObjectType + "_2_2")[0].visibility;
           obj3 = objects.filter(d => d.id === selectedObjectType + "_3_1")[0].visibility;
           if(obj1 && obj2 && obj3) {
-            this.games.morpion.params.end_game_msg = "Victoire de " + public_name;
+            this.games[t].params.end_game_msg = "Victoire de " + public_name;
           }
           
           // all filled
-          if(this.games.morpion.params.end_game_msg === "") {
-            let n_cell = this.games.morpion.params.n_cell;
-            if(this.games.morpion.params.circle.n_checked + this.games.morpion.params.cross.n_checked === n_cell * n_cell) {
-              this.games.morpion.params.end_game_msg = "Fin de partie : égalité";
+          if(this.games[t].params.end_game_msg === "") {
+            let n_cell = this.games[t].params.n_cell;
+            if(this.games[t].params.circle.n_checked + this.games[t].params.cross.n_checked === n_cell * n_cell) {
+              this.games[t].params.end_game_msg = "Fin de partie : égalité";
             }
           }
 
           // send game update
-          window.APIClient.sendGameUpdate(vm.games.morpion);
+          window.APIClient.sendGameUpdate(vm.games[t]);
 
-          if(vm.games.morpion.params.end_game_msg !== "") {
+          if(vm.games[t].params.end_game_msg !== "") {
             this.player_order = 0;
             window.APIClient.sendGameUpdate({player_order:0});
           }

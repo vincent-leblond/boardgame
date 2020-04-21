@@ -28,7 +28,7 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
       v-model="drawer"
-      width="150px"
+      width="650px"
     >
       <v-list dense>
         <v-list-item link @click="tabModel=0">
@@ -42,16 +42,17 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-<!--       <v-container v-if="visio">
+      <v-divider></v-divider>
+      <v-container v-if="visio">
         <iframe
             
             id="myIframe"
             allow="camera; microphone"
-            width="600"
+            width="620"
             height="400"
             :src="'https://meet.jit.si/' + room"
         ></iframe>
-      </v-container> -->
+      </v-container>
     </v-navigation-drawer>
 
     <v-app-bar

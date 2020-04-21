@@ -8,7 +8,12 @@ class WebSocketClient {
   constructor() {
     this.gameId = undefined;
     this.listeners = {};
-    this.ws = new WebSocket("ws://94.23.12.225:908/");
+    let url = top.location.protocol === "https:" ? "wss://" : "ws://";
+    url += top.location.host;
+    if (top.location.host === "localhost:8080") {
+      url = "ws://localhost:8081";
+    }
+    this.ws = new WebSocket(url);
     this.ws.onopen = () => {
       if (this.listeners["connect"]) {
         this.listeners["connect"].forEach((listener) => {

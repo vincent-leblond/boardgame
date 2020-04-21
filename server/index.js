@@ -1,9 +1,38 @@
 const WebSocket = require("ws");
+const serveStatic = require("serve-static");
+const fs = require("fs");
 
-const wss = new WebSocket.Server({ port: 8081 });
+const inDocker = fs.existsSync("/.dockerenv");
+let wsArgs = {};
+// Inside Docker so run the whole game
+if (inDocker) {
+  wsArgs.noServer = true;
+} else {
+  wsArgs.port = 8081;
+}
+
+const wss = new WebSocket.Server(wsArgs);
 const uuid = require("uuid");
 
 const games = {};
+
+if (inDocker) {
+  const http = require("http");
+  const serve = serveStatic("/public", { index: ["index.html"] });
+  const server = http.createServer((req, res) => {
+    serve(req, res, () => {
+      res.writeHead(404);
+      res.end();
+    });
+  });
+  // Add WS
+  server.on("upgrade", function upgrade(request, socket, head) {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit("connection", ws, request);
+    });
+  });
+  server.listen(80);
+}
 
 class Game {
   constructor() {

@@ -28,7 +28,7 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
       v-model="drawer"
-      width="650px"
+      :width="navigation_width"
     >
       <v-list dense>
         <v-list-item link @click="tabModel=0">
@@ -41,12 +41,16 @@
             <v-list-item-title>Morpion calcul</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link @click="tabModel=2">
+          <v-list-item-content>
+            <v-list-item-title>Morpion test</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
       <v-divider></v-divider>
       <v-container v-if="visio">
         <iframe
-            
-            id="myIframe"
+            id="visio"
             allow="camera; microphone"
             width="620"
             height="400"
@@ -325,6 +329,17 @@
               </v-row>
             </v-container>
           </v-tab-item>
+          <!-- TAB test -->
+          <v-tab-item style="height: 100%">
+            <morpion
+              message="test"
+              :one_screen="one_screen"
+              :player_order="player_order"
+              :mode_morpion="mode_morpion"
+              type="calcul"
+              >
+            </morpion>
+          </v-tab-item>
         </v-tabs-items>
       </v-container>
     </v-content>
@@ -332,16 +347,19 @@
 </template>
 
 <script>
+import Morpion from "./components/Morpion";
 
 export default {
   name: "App",
   components: {
+    "morpion": Morpion,
   },
   data() {
     return {
       one_screen: false,
       player_order: 0, // 0 if all players on same screen, 1 if first, etc
       drawer: null,
+      navigation_width: "650px",
       items: [],
       games: {
         morpion: {
@@ -454,6 +472,10 @@ export default {
       vm.visio = true;
     } else if (visio == "false") {
       vm.visio = false;
+    }
+    if(window.innerWidth < 500) {
+      vm.visio = false;
+      vm.navigation_width = "150px";
     }
 
     if(development_mode === undefined) {
@@ -793,6 +815,5 @@ export default {
 .v-overlay__scrim {
   background-color: #37ab9c !important;
 }
-
 </style>
 

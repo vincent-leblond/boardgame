@@ -5,4 +5,4 @@ npm run build
 cd ../server
 npm install
 cd ..
-docker build . -t boardgame:latest
+docker build . -t loopingz/boardgame:latest

@@ -11,7 +11,7 @@ script:
   - sh build.sh
 deploy:
   provider: script
-  script: 'echo $DOCKERHUB_TOKEN | docker login --username loopingz --password-stdin && docker push loopingz/boardgame:latest'
+  script: 'echo "$DOCKERHUB_TOKEN" | docker login -u loopingz --password-stdin && docker push loopingz/boardgame:latest'
   skip_cleanup: true
   on:
     tags: true

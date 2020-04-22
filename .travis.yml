@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "10"
+cache:
+  yarn: true
+  directories:
+    - node_modules
+service:
+  - docker
+script:
+  - sh build.sh
+deploy:
+  provider: script
+  script: 'echo $DOCKERHUB_TOKEN | docker login --username loopingz --password-stdin && docker push loopingz/boardgame:latest'
+  skip_cleanup: true
+  on:
+    tags: true

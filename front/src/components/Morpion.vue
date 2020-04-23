@@ -3,15 +3,15 @@
     <v-row>
       <v-col col="6" md="6">
         <v-row v-if="type=='calcul'">
-          <v-col col="2" md="2">
+          <v-col col="4" md="4">
             <v-btn color="primary" @click="launch_die(2)">Lancer</v-btn>
           </v-col>
-          <v-col col="1" md="1">
+          <v-col col="8" md="8">
             <img :src="'static/Dice-' + game.params.dice[0] + '.svg'" height="42" width="42" />
-          </v-col>
-          <v-col col="1" md="1">
+            <v-spacer></v-spacer>
             <img :src="'static/Dice-' + game.params.dice[1] + '.svg'" height="42" width="42" />
           </v-col>
+
         </v-row>
         <v-row>
           <v-col col="12" md="12">

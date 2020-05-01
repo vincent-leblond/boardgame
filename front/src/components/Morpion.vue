@@ -115,7 +115,7 @@
       <v-col col="12" md="12">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" @click="clearMorpion" v-on="on">Rejouer</v-btn>
+            <v-btn color="primary" @click="clearMorpion(false)" v-on="on">Rejouer</v-btn>
           </template>
           <span>Rejouer</span>
         </v-tooltip>
@@ -188,10 +188,43 @@ export default {
 
     // game update listener
     window.APIClient.on("update", (player, info) => {
+      // end game
+      if (Object.keys(info).indexOf("end_game_msg") > -1) {
+        // eslint-disable-next-line
+        console.log("end game");
+        this.game.params.end_game_msg = info.end_game_msg;
+      }
+      // position visibility
+      if (Object.keys(info).indexOf("visibility") > -1) {
+        // eslint-disable-next-line
+        console.log("visibility");
+        this.updateObjectVisibility(
+          info.visibility.objId,
+          info.visibility.objectType,
+          info.visibility.visibility,
+          info.visibility.local
+        )
+      }
+      // clear game
+      if (Object.keys(info).indexOf("clear") > -1) {
+        // eslint-disable-next-line
+        console.log("clear");
+        this.clearMorpion(info.clear)
+      }
+      // update dices
+      if (Object.keys(info).indexOf("dice") > -1) {
+        // eslint-disable-next-line
+        console.log("dice");
+        this.game.params.dice = info.dice;
+      }
       if (Object.keys(info).indexOf("params") > -1) {
+        // eslint-disable-next-line
+        console.log("big update");
         this.game = info;
       }
       if (Object.keys(info).indexOf("player_order") > -1) {
+        // eslint-disable-next-line
+        console.log("player_order");
         this.player_order = info.player_order;
       }
     });
@@ -205,7 +238,9 @@ export default {
           Math.floor(Math.random() * 6 + 1)
         ];
       }
-      window.APIClient.sendGameUpdate(this.game);
+      window.APIClient.sendGameUpdate({
+        dice: this.game.params.dice
+      });
     },
     // draw Morpion game board
     drawMorpion() {
@@ -256,31 +291,47 @@ export default {
       }
     },
     // clear objects of Morpion
-    clearMorpion() {
+    clearMorpion(local = false) {
       let n_cell = this.game.params.n_cell;
       for (let row = 1; row <= n_cell; row++) {
         for (let col = 1; col <= n_cell; col++) {
           let objId = row + "_" + col;
-          this.updateObjectVisibility(objId, "circle", false);
-          this.updateObjectVisibility(objId, "cross", false);
+          this.updateObjectVisibility(objId, "circle", false, local);
+          this.updateObjectVisibility(objId, "cross", false, local);
         }
       }
       this.game.params.circle.n_checked = 0;
       this.game.params.cross.n_checked = 0;
 
       this.game.params.end_game_msg = "";
-      window.APIClient.sendGameUpdate(this.game);
+
+      if(!local) {
+        window.APIClient.sendGameUpdate({ clear: true });
+      }
       this.player_order = 0;
       window.APIClient.sendGameUpdate({ player_order: 0 });
     },
     // update object visibility
-    updateObjectVisibility(objId, objectType, visibility) {
+    updateObjectVisibility(objId, objectType, visibility, local = false) {
       for (let c = 0; c < this.game[objectType].length; c++) {
         if (this.game[objectType][c].id === objectType + "_" + objId) {
           this.game[objectType][c].visibility = visibility;
         }
       }
-      window.APIClient.sendGameUpdate(this.game);
+      
+      this.game.params[objectType].n_checked++;
+      
+      if(!local) {
+        window.APIClient.sendGameUpdate({
+          visibility: {
+            objId: objId,
+            objectType: objectType,
+            visibility: visibility,
+            local: true
+          }
+        })
+      }
+      // window.APIClient.sendGameUpdate(this.game);
     },
     // add an object on board
     addObject(board_id) {
@@ -353,7 +404,6 @@ export default {
           selectedObjectType,
           true
         );
-        this.game.params[selectedObjectType].n_checked++;
       }
       return selectedObjectType;
     },
@@ -367,7 +417,6 @@ export default {
       let row = row_cell - 1;
       let col = col_cell - 1;
       let cell_num = row + 1 + col * n_cell;
-
       // check allowed to add object
       // detect winner or draw
       if (this.game.params.end_game_msg === "") {
@@ -457,7 +506,9 @@ export default {
           }
 
           // send game update
-          window.APIClient.sendGameUpdate(this.game);
+          window.APIClient.sendGameUpdate({
+            end_game_msg: this.game.params.end_game_msg
+          });
 
           if (this.game.params.end_game_msg !== "") {
             this.player_order = 0;

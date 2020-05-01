@@ -140,14 +140,18 @@ export default {
     let visio = params.get("visio");
     let one_screen = params.get("one_screen");
 
-    if(visio === undefined) {
-      vm.visio = true;
-    } else if (visio == "false") {
-      vm.visio = false;
+    if(visio === null) {
+      this.visio = false;
+    } else if (visio == "true") {
+      this.visio = true;
     }
     if(window.innerWidth < 500) {
-      vm.visio = false;
-      vm.navigation_width = "150px";
+      this.visio = false;
+      this.navigation_width = "150px";
+    }
+
+    if(!this.visio) {
+      this.navigation_width = "150px";
     }
 
     if(room !== null) {
@@ -156,9 +160,9 @@ export default {
 
     if(one_screen !== null) {
       if(one_screen === "true") {
-        vm.one_screen = true;
+        this.one_screen = true;
       } else {
-        vm.one_screen = false;
+        this.one_screen = false;
       }
     }
   },

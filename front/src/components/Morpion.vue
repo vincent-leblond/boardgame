@@ -7,11 +7,12 @@
             <v-btn color="primary" @click="launch_die(2)">Lancer</v-btn>
           </v-col>
           <v-col col="8" md="8">
-            <img :src="'static/Dice-' + game.params.dice[0] + '.svg'" height="42" width="42" />
+            <img :src="'static/Dice-' + game.params.dice[0] + '.svg'"
+              height="42" width="42" />
             <v-spacer></v-spacer>
-            <img :src="'static/Dice-' + game.params.dice[1] + '.svg'" height="42" width="42" />
+            <img :src="'static/Dice-' + game.params.dice[1] + '.svg'"
+              height="42" width="42" />
           </v-col>
-
         </v-row>
         <v-row>
           <v-col col="12" md="12">
@@ -55,7 +56,7 @@
                       y="5"
                       height="90px"
                       width="90px"
-                      v-if="game.params.mode_morpion==='pokemon'"
+                      v-if="game.params.mode==='pokemon'"
                     />
                     <circle
                       :cx="item.cx"
@@ -64,7 +65,7 @@
                       :stroke="item.color"
                       stroke-width="4"
                       fill="none"
-                      v-if="game.params.mode_morpion==='normal'"
+                      v-if="game.params.mode==='classique'"
                     />
                   </g>
                 </g>
@@ -81,9 +82,9 @@
                       y="5"
                       height="90px"
                       width="90px"
-                      v-if="game.params.mode_morpion==='pokemon'"
+                      v-if="game.params.mode==='pokemon'"
                     />
-                    <g v-if="game.params.mode_morpion==='normal'">
+                    <g v-if="game.params.mode==='classique'">
                       <line
                         v-show="item.visibility"
                         :x1="item.x1[0]"
@@ -112,15 +113,27 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col col="12" md="12">
+      <v-col col="2" md="2">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" @click="clearMorpion(false)" v-on="on">Rejouer</v-btn>
+            <v-btn color="primary" @click="clearMorpion(false)"
+              v-on="on">Rejouer</v-btn>
           </template>
           <span>Rejouer</span>
         </v-tooltip>
-        {{ game.params.end_game_msg }}
       </v-col>
+      <v-col col="1" md="1">
+        <v-select
+          label="Mode de jeu"
+          v-model="game.params.mode"
+          :items="modes"
+        ></v-select>
+      </v-col>
+    </v-row>
+    <v-row>
+      <h3>
+        {{ game.params.end_game_msg }}
+      </h3>
     </v-row>
   </v-container>
 </template>
@@ -128,11 +141,12 @@
 <script>
 export default {
   name: "Morpion",
-  props: ["one_screen", "mode_morpion", "type"],
+  props: ["one_screen", "type"],
   components: {},
   data() {
     return {
       player_order: 0,
+      modes: ["classique", "pokemon"],
       game: {
         params: {
           dice: [1, 1],
@@ -142,13 +156,13 @@ export default {
           svg_size: 350,
           left_margin: 20,
           top_margin: 20,
-          mode: "normal",
+          mode: "classique",
           board: {
             default_visibility: true
           },
           cross: {
             public_name: {
-              normal: "croix",
+              classique: "croix",
               pokemon: "Tortank"
             },
             margin: 15,
@@ -159,7 +173,7 @@ export default {
           },
           circle: {
             public_name: {
-              normal: "cercle",
+              classique: "cercle",
               pokemon: "Pikachu"
             },
             proportion: 2.5,
@@ -176,11 +190,6 @@ export default {
     };
   },
   created() {
-    if (this.mode_morpion !== null) {
-      this.game.params.mode_morpion = this.mode_morpion;
-    } else {
-      this.game.params.mode_morpion = "normal";
-    }
   },
   computed: {},
   mounted() {
@@ -441,7 +450,7 @@ export default {
           let objects = this.game[selectedObjectType];
 
           let public_name = this.game.params[selectedObjectType].public_name[
-            this.game.params.mode_morpion
+            this.game.params.mode
           ];
 
           // vertical

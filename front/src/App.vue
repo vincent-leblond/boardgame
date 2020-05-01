@@ -124,7 +124,6 @@
           <v-tab-item style="height: 100%">
             <morpion
               :one_screen="one_screen"
-              :mode_morpion="'pokemon'"
               type=""
               >
             </morpion>
@@ -133,7 +132,6 @@
           <v-tab-item style="height: 100%">
             <morpion
               :one_screen="one_screen"
-              :mode_morpion="'pokemon'"
               type="calcul"
               >
             </morpion>

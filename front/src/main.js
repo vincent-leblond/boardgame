@@ -2,7 +2,10 @@ import { v4 as uuid } from "uuid";
 import Vue from "vue";
 import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
+import VueClipboard from 'vue-clipboard2';
 Vue.config.productionTip = false;
+
+Vue.use(VueClipboard);
 
 class WebSocketClient {
   constructor() {

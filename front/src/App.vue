@@ -13,14 +13,52 @@
             <h1>Jeux d'enfants</h1>
             <br />
             <v-btn
-              @click="overlay = false;"
+              @click="one_screen = false;dialog_url = true;"
               :color="$vuetify.theme.themes.light.secondary"
             >
-              Entrer
+              <v-icon left>people_alt</v-icon> Jouer à plusieurs
+            </v-btn>
+            <br />
+            <br />
+            <v-btn
+              @click="overlay = false;one_screen = true;"
+              :color="$vuetify.theme.themes.light.secondary"
+            >
+              <v-icon left>person</v-icon> Un seul écran
             </v-btn>
           </v-col>
         </v-row>
       </div>
+        <v-dialog v-model="dialog_url" max-width="400px">
+          <v-card color="primary">
+            <v-card-title>
+              <h3 style="color:white">Partagez ce lien avec votre ami</h3>
+            </v-card-title>
+            <v-card-text>
+              <v-row justify="center" align="center">
+                {{ url }}
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn class="ma-2" large color="white" icon
+                      v-clipboard:copy="url"
+                      v-on="on">
+                      <v-icon dark>filter_none</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Copier</span>
+                </v-tooltip>
+              </v-row>
+              <v-row justify="center" align="center">
+                <v-btn
+                  @click="dialog_url = false;overlay = false;"
+                  :color="$vuetify.theme.themes.light.secondary"
+                >
+                  Jouer
+                </v-btn>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
     </v-overlay>
 
     <v-navigation-drawer
@@ -108,6 +146,7 @@
 
 <script>
 import Morpion from "./components/Morpion";
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: "App",
@@ -119,18 +158,20 @@ export default {
       one_screen: false,
       drawer: null,
       navigation_width: "650px",
-      overlay: false,
+      overlay: true,
       error_msg: "",
       visio: true,
       tabModel: 0,
       isLoading: false,
       errormsg: "",
       tab: null,
-      room: "boardgame"
+      room: "boardgame",
+      url: null,
+      dialog_url: false
     };
   },
   created() {
-    let vm = this;
+    this.party_url = uuidv4();
 
     // get url params without vue-route
     let uri = window.location.search.substring(1); 
@@ -154,8 +195,13 @@ export default {
       this.navigation_width = "150px";
     }
 
-    if(room !== null) {
-      vm.room = vm.room + "_" + room;
+    if(room === null) {
+      this.room = uuidv4().split("-")[0];
+      this.url = top.location + "?room=" +
+        this.room;
+    } else {
+      this.room = room;
+      this.overlay = false;
     }
 
     if(one_screen !== null) {

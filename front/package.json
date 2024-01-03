@@ -15,7 +15,7 @@
     "d3": "^5.15.1",
     "dataframe-js": "^1.4.3",
     "file-saver": "^2.0.2",
-    "plotly.js": "^1.51.1",
+    "plotly.js": "^2.25.2",
     "plotly.js-dist": "^1.49.5",
     "read-excel-file": "^4.0.5",
     "uuid": "^7.0.3",
